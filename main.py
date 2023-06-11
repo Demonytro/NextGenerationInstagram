@@ -8,11 +8,6 @@ app = FastAPI()
 
 @app.get("/")
 def root():
-    """
-    The root function is a simple endpoint that returns a welcome message.
-
-    :return: A dictionary with a message
-    """
     return {"message": "Welcome to API!"}
 
 

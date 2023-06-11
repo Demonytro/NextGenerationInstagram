@@ -1,78 +1,142 @@
-from fastapi import APIRouter, Security
 from sqlalchemy.orm import Session
-from fastapi.security import  HTTPBearer
+from fastapi.security import HTTPBearer
 import cloudinary
 import cloudinary.uploader
-from database.models import Image
+from database.models import Image, User
+from database.db import get_db
 from configure.config import settings
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Path
+from sqlalchemy import and_
+from schemas import ImageResponseCloudinaryModel
+
 
 
 router = APIRouter(prefix='/cloudinary', tags=["cloudinary"])
 security = HTTPBearer()
 
 
-@router.patch('/{image_id}')
-async def cloudinary_set(file: UploadFile = File(), image: Image, db: Session = Depends(get_db)):
+@router.patch('/{image_id}', response_model=ImageResponseCloudinaryModel)
+async def cloudinary_set(image_id: int = Path(description="The ID of the image", ge=1), file: UploadFile = File(), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    r = cloudinary.uploader.upload(file.file, public_id=f'UsersPhoto/{image.user_id}', overwrite=True)
-    src_url = cloudinary.CloudinaryImage(f'UsersPhoto/{image.user_id}') \
+    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    if new_image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
+    r = cloudinary.uploader.upload(file.file, public_id=f'UsersPhoto/{new_image.user_id}', overwrite=True)
+    src_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}') \
         .build_url(width=250, height=250, crop='fill', version=r.get('version'))
-    image.picture = src_url
+    new_image.picture = src_url
     db.commit()
+    return new_image
 
-@router.patch("/{image_id}/cropped")
-async def cloudinary_cropped(image: Image, height: int, width: int, db: Session = Depends(get_db)):
+@router.patch("/{image_id}/cropped", response_model=ImageResponseCloudinaryModel)
+async def cloudinary_cropped(image_id: int = Path(description="The ID of the image", ge=1), height: int = 100, width: int = 100, db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    new_url = cloudinary.CloudinaryImage("sample.jpg").image(transformation=[{'height': height, 'width': width, 'crop': "fill"}])
-    image.picture = new_url
+    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    if new_image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
+    try:
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'height': height, 'width': width, 'crop': "fill"}])
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
+    new_image.picture = new_url
     db.commit()
+    return new_image
 
 
-@router.patch("/{image_id}/scaled")
-async def cloudinary_scaled(image: Image, crop: str, blur: int, db: Session = Depends(get_db)):
+@router.patch("/{image_id}/scaled", response_model=ImageResponseCloudinaryModel)
+async def cloudinary_scaled(image_id: int = Path(description="The ID of the image", ge=1), crop: str = None, blur: int = 100, db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    new_url = cloudinary.CloudinaryImage("sample.jpg").image(transformation=[{'crop': crop},{'effect': f"blur:{blur}"}])
-    image.picture = new_url
+    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    if new_image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
+    try:
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'crop': crop},{'effect': f"blur:{blur}"}])
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
+    new_image.picture = new_url
     db.commit()
+    return new_image
 
-@router.patch("/{image_id}/zoom")
-async def cloudinary_zoom(image: Image, zoom: float, db: Session = Depends(get_db)):
+@router.patch("/{image_id}/zoom", response_model=ImageResponseCloudinaryModel)
+async def cloudinary_zoom(image_id: int = Path(description="The ID of the image", ge=1), zoom: float = 1.0, db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    new_url = cloudinary.CloudinaryImage("sample.jpg").image(transformation=[{'zoom': zoom}])
-    image.picture = new_url
+    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    if new_image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
+    try:
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{image.user_id}').image(transformation=[{'zoom': zoom}])
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
+    new_image.picture = new_url
     db.commit()
+    return new_image
 
 
-#
 
-@router.patch("/{image_id}/radius")
-async def cloudinary_radius(image: Image, db: Session = Depends(get_db)):
+@router.patch("/{image_id}/radius", response_model=ImageResponseCloudinaryModel)
+async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    new_url = cloudinary.CloudinaryImage("sample.jpg").image(transformation=[{'radius': "max"}])
-    image.picture = new_url
+    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    if new_image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
+    try:
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'radius': "max"}])
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
+    new_image.picture = new_url
     db.commit()
+    return new_image
+
+
+#shadow
+@router.patch("/{image_id}/shadow", response_model=ImageResponseCloudinaryModel)
+async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), color: str = "black", x:int = 10, y: int = 10,  db: Session = Depends(get_db)):
+    cloudinary.config(
+        cloud_name=settings.cloudinary_name,
+        api_key=settings.cloudinary_api_key,
+        api_secret=settings.cloudinary_api_secret,
+        secure=True
+    )
+    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    if new_image is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
+    try:
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'color': color, 'effect': "shadow", 'x': x, 'y': y}])
+    except:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
+    new_image.picture = new_url
+    db.commit()
+    return new_image
+
+

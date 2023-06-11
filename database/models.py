@@ -12,7 +12,7 @@ class Image(Base):
     created_at = Column(DateTime, default=func.now())
     update_at = Column(DateTime, default=func.now(), onupdate=func.now())
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
-    user = relationship('User', backref="contact")
+    user = relationship('User', backref="image")
 
 
 class User(Base):
