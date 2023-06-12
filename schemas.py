@@ -4,8 +4,11 @@ from typing import Optional
 
 class ImageResponseCloudinaryModel(BaseModel):
     id: int
-    picture: str
+    image: str
     is_active: bool
-    created_at: datetime
-    update_at: datetime
+    # created_at: datetime
+    # update_at: datetime
     user_id: int
+
+    class Config():
+        orm_mode = True

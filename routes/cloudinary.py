@@ -27,10 +27,10 @@ async def cloudinary_set(image_id: int = Path(description="The ID of the image",
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
-    r = cloudinary.uploader.upload(file.file, public_id=f'UsersPhoto/{new_image.user_id}', overwrite=True)
-    src_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}') \
+    r = cloudinary.uploader.upload(file.file, public_id=f'UsersPhoto/{new_image.user_id}/{new_image.id}', overwrite=True)
+    src_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}/{new_image.id}') \
         .build_url(width=250, height=250, crop='fill', version=r.get('version'))
-    new_image.picture = src_url
+    new_image.image = src_url
     db.commit()
     return new_image
 
@@ -47,16 +47,16 @@ async def cloudinary_cropped(image_id: int = Path(description="The ID of the ima
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
-        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'height': height, 'width': width, 'crop': "fill"}])
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}/{new_image.id}').build_url(height=height, width =width, crop = "fill")
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
-    new_image.picture = new_url
+    new_image.image = new_url
     db.commit()
     return new_image
 
 
 @router.patch("/{image_id}/scaled", response_model=ImageResponseCloudinaryModel)
-async def cloudinary_scaled(image_id: int = Path(description="The ID of the image", ge=1), crop: str = None, blur: int = 100, db: Session = Depends(get_db)):
+async def cloudinary_scaled(image_id: int = Path(description="The ID of the image", ge=1), crop: str = "fill", blur: int = 100, db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
@@ -68,10 +68,10 @@ async def cloudinary_scaled(image_id: int = Path(description="The ID of the imag
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
-        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'crop': crop},{'effect': f"blur:{blur}"}])
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}/{new_image.id}').build_url(crop = crop, effect= f"blur:{blur}")
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
-    new_image.picture = new_url
+    new_image.image = new_url
     db.commit()
     return new_image
 
@@ -88,10 +88,10 @@ async def cloudinary_zoom(image_id: int = Path(description="The ID of the image"
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
-        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{image.user_id}').image(transformation=[{'zoom': zoom}])
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}/{new_image.id}').build_url(zoom=zoom)
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
-    new_image.picture = new_url
+    new_image.image = new_url
     db.commit()
     return new_image
 
@@ -110,10 +110,10 @@ async def cloudinary_radius(image_id: int = Path(description="The ID of the imag
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
-        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'radius': "max"}])
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}/{new_image.id}').build_url(radius = "max")
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
-    new_image.picture = new_url
+    new_image.image = new_url
     db.commit()
     return new_image
 
@@ -132,10 +132,10 @@ async def cloudinary_radius(image_id: int = Path(description="The ID of the imag
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
-        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}').image(transformation=[{'color': color, 'effect': "shadow", 'x': x, 'y': y}])
+        new_url = cloudinary.CloudinaryImage(f'UsersPhoto/{new_image.user_id}/{new_image.id}').build_url(color=color, effect="shadow", x=x, y=y)
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Attribute is not correctly!")
-    new_image.picture = new_url
+    new_image.image = new_url
     db.commit()
     return new_image
 
