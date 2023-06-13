@@ -3,9 +3,9 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     sqlalchemy_database_url: str
-    cloud_name = "cloud_name"
-    cloud_api_key = "0000000000"
-    cloud_api_secret = "secret"
+    cloudinary_name: str
+    cloudinary_api_key: str
+    cloudinary_api_secret: str
 
     class Config:
         env_file = '.env'

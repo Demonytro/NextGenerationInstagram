@@ -16,12 +16,12 @@ app.mount('/static', StaticFiles(directory="static"), name='static')
 
 
 @app.get('/', response_class=HTMLResponse)
-def home(request: Request):
+async def home(request: Request):
     return templates.TemplateResponse('index.html', {"request": request})
 
 
 @app.get("/api/healthchecker")
-def healthchecker(db: Session = Depends(get_db)):
+async def healthchecker(db: Session = Depends(get_db)):
     try:
         result = db.execute(text("SELECT 1")).fetchone()
         if result is None:
@@ -34,5 +34,6 @@ def healthchecker(db: Session = Depends(get_db)):
 
 app.include_router(images.router, prefix="/api")
 
+
 if __name__ == '__main__':
-    uvicorn.run(app, host='localhost', port=8000)
+    uvicorn.run("main:app", host='localhost', port=8000, reload=True)
