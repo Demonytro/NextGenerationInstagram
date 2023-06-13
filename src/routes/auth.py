@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status, Security
+from fastapi import APIRouter, HTTPException, Depends, status, Security, Path
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
 
 from src.schemas import UserModel, UserResponse, TokenModel
@@ -68,4 +68,10 @@ async def list_of_users_route(current_user: User = Depends(auth_service.get_curr
 @has_role(["admin", "moderator"])
 async def list_of_users_route(current_user: User = Depends(auth_service.get_current_user)):
     return {"message": "Trying [admin,moderator]!"}
+
+@router.get("/test_for_current_user/{image_id}")
+@has_role(["admin", "moderator"])
+async def test_for_image_id(current_user: User = Depends(auth_service.get_current_user), image_id: int = Path(...), db: Session = Depends(get_db)):
+    return {"message": f"Test for image_id!"}
+
 
