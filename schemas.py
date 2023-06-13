@@ -1,3 +1,4 @@
+
 from typing import List
 
 from fastapi import UploadFile
@@ -35,6 +36,30 @@ class ImageResponse(BaseModel):
     comments: List[str] = []
 
 
+
+class CommentBase(BaseModel):
+    text: str = Field(max_length=500)
+
+
+class CommentModel(CommentBase):
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+    user_id: int
+    image_id: int
+    update_status: bool = False
+
+    class Config:
+        orm_mode = True
+
+
+class CommentUpdate(CommentModel):
+    update_status: bool = True
+    updated_at = datetime
+
+    class Config:
+        orm_mode = True
+        
 class ImageResponseCloudinaryModel(BaseModel):
     id: int
     image: str
@@ -44,4 +69,5 @@ class ImageResponseCloudinaryModel(BaseModel):
     # user_id: int
 
     class Config():
+
         orm_mode = True

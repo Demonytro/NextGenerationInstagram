@@ -1,7 +1,9 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean
+
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -17,7 +19,9 @@ class Image(Base):
     comments = relationship('Comment', backref='image')
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+
     user = relationship('User', backref="image")
     is_active = Column(Boolean, default=True)
 
@@ -32,10 +36,24 @@ class Tag(Base):
 class Comment(Base):
     __tablename__ = 'comments'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    image_id = Column(Integer, ForeignKey('images.id'))
-    content = Column(String, nullable=False)
+# <<<<<<< Daniil
+    text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    user_id = Column('user_id', ForeignKey(
+        'users.id', ondelete='CASCADE'), default=None)
+    image_id = Column('image_id', ForeignKey(
+        'images.id', ondelete='CASCADE'), default=None)
+    update_status = Column(Boolean, default=False)
+
+    user = relationship('User', backref="comments")
+    image = relationship('Image', backref="comments")
+# =======
+#     image_id = Column(Integer, ForeignKey('images.id'))
+#     content = Column(String, nullable=False)
+#     created_at = Column(DateTime, default=datetime.now)
+#     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+# >>>>>>> dev
 
 
 image_tag = Table(
