@@ -1,7 +1,6 @@
 from datetime import datetime
 from enum import Enum
 
-
 from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -36,6 +35,7 @@ class Tag(Base):
 class Comment(Base):
     __tablename__ = 'comments'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
 # <<<<<<< Daniil
     text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.now)
@@ -79,4 +79,6 @@ class User(Base):
     created_at = Column('crated_at', DateTime, default=func.now())
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
+
     role = Column(String(20), default=UserRole.USER)
+
