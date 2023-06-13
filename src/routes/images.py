@@ -10,20 +10,23 @@ from src.conf.config import settings
 from src.database.db import get_db
 from src.database.models import Image, Tag
 
-
 router = APIRouter(prefix="/images", tags=["images"])
+
+
+def config():
+    return cloudinary.config(
+        cloud_name=settings.cloudinary_name,
+        api_key=settings.cloudinary_api_key,
+        api_secret=settings.cloudinary_api_secret,
+        secure=True
+    )
 
 
 @router.post("/", response_model=ImageResponse)
 async def create_image(image: UploadFile = File(...), description: str = None, tags: List[str] = [],
                        db: Session = Depends(get_db)):
     try:
-        cloudinary.config(
-            cloud_name=settings.cloudinary_name,
-            api_key=settings.cloudinary_api_key,
-            api_secret=settings.cloudinary_api_secret,
-            secure=True
-        )
+        config()
         uploaded_image = cloudinary.uploader.upload(image.file)
 
         image_url = uploaded_image['secure_url']
@@ -68,12 +71,7 @@ async def delete_image(image_id: int, db: Session = Depends(get_db)):
 @router.put("/{image_id}/update-image", response_model=ImageResponse)
 async def update_image_image(image_id: int, image_data: UploadFile = File(...), db: Session = Depends(get_db)):
     try:
-        cloudinary.config(
-            cloud_name=settings.cloudinary_name,
-            api_key=settings.cloudinary_api_key,
-            api_secret=settings.cloudinary_api_secret,
-            secure=True
-        )
+        config()
 
         image = db.query(Image).filter(Image.id == image_id).first()
         if not image:
