@@ -100,7 +100,11 @@ async def update_image_image(image_id: int, image_data: UploadFile = File(...), 
 
 
 @router.put("/{image_id}/update-tags", response_model=ImageResponse)
-async def update_image_tags(image_id: int, tag_data: ImageUpdateTagsRequest, db: Session = Depends(get_db)):
+async def update_image_tags(
+        image_id: int,
+        tags: List[str] = Query(..., description="List of tags to update for the image"),
+        db: Session = Depends(get_db)
+):
     try:
         image = db.query(Image).filter(Image.id == image_id).first()
         if not image:
@@ -108,7 +112,7 @@ async def update_image_tags(image_id: int, tag_data: ImageUpdateTagsRequest, db:
 
         image.tags.clear()
 
-        for tag_data in tag_data.tags:
+        for tag_data in tags:
             tag = db.query(Tag).filter_by(name=tag_data).first()
             if not tag:
                 tag = Tag(name=tag_data)
@@ -174,8 +178,10 @@ async def get_images_by_tags(tags: List[str] = Query(...), db: Session = Depends
     try:
         images = db.query(Image).join(Image.tags).filter(Tag.name.in_(tags)).all()
 
+        filtered_images = [image for image in images if set(tags).issubset({tag.name for tag in image.tags})]
+
         image_responses = []
-        for image in images:
+        for image in filtered_images:
             image_responses.append(ImageResponse(
                 id=image.id,
                 image=image.image,
