@@ -2,7 +2,9 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
+
     sqlalchemy_database_url: str
+
 
     cloud_name = "cloud_name"
     cloud_api_key = "0000000000"

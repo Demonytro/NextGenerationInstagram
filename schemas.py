@@ -1,4 +1,3 @@
-
 from typing import List
 
 from fastapi import UploadFile
@@ -7,12 +6,24 @@ from pydantic.types import conlist
 
 
 class ImageCreateRequest(BaseModel):
+    image: str
     description: str = None
     tags: conlist(constr(max_length=50), min_items=1, max_items=5) = []
 
 
+
 class ImageUpdateRequest(BaseModel):
     description: str
+# <<<<<<< Polina
+    tags: List[str] = []
+
+
+class ImageResponse(BaseModel):
+    image: str
+    description: str
+    tags: List[str] = []
+    comments: List[str] = []
+# =======
     tags: conlist(constr(max_length=50), min_items=1, max_items=5) = []
 
 
@@ -71,3 +82,4 @@ class ImageResponseCloudinaryModel(BaseModel):
     class Config():
 
         orm_mode = True
+# >>>>>>> dev
