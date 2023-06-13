@@ -56,7 +56,6 @@ class Comment(Base):
 # >>>>>>> dev
 
 
-
 image_tag = Table(
     'image_tag',
     Base.metadata,

@@ -24,6 +24,7 @@ class ImageResponse(BaseModel):
     tags: List[str] = []
     comments: List[str] = []
 # =======
+
     tags: conlist(constr(max_length=50), min_items=1, max_items=5) = []
 
 
@@ -82,4 +83,3 @@ class ImageResponseCloudinaryModel(BaseModel):
     class Config():
 
         orm_mode = True
-# >>>>>>> dev
