@@ -8,6 +8,8 @@ from configure.config import settings
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Path
 from sqlalchemy import and_
 from schemas import ImageResponseCloudinaryModel
+#--------------01--------------------імпорт декоратора has_role---------------------------------------------
+#--------------02--------------------імпорт auth_service----------------------------------------------------
 
 
 
@@ -16,15 +18,16 @@ security = HTTPBearer()
 
 
 @router.patch('/{image_id}', response_model=ImageResponseCloudinaryModel)
-async def cloudinary_set(image_id: int = Path(description="The ID of the image", ge=1), file: UploadFile = File(), db: Session = Depends(get_db)):
+@has_role("user")
+async def cloudinary_set(image_id: int = Path(description="The ID of the image", ge=1), file: UploadFile = File(), current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
-    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    # new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     r = cloudinary.uploader.upload(file.file, public_id=f'UsersPhoto/{new_image.user_id}/{new_image.id}', overwrite=True)
@@ -35,7 +38,8 @@ async def cloudinary_set(image_id: int = Path(description="The ID of the image",
     return new_image
 
 @router.patch("/{image_id}/cropped", response_model=ImageResponseCloudinaryModel)
-async def cloudinary_cropped(image_id: int = Path(description="The ID of the image", ge=1), height: int = 100, width: int = 100, db: Session = Depends(get_db)):
+@has_role("user")
+async def cloudinary_cropped(image_id: int = Path(description="The ID of the image", ge=1), height: int = 100, width: int = 100, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
@@ -56,15 +60,16 @@ async def cloudinary_cropped(image_id: int = Path(description="The ID of the ima
 
 
 @router.patch("/{image_id}/scaled", response_model=ImageResponseCloudinaryModel)
-async def cloudinary_scaled(image_id: int = Path(description="The ID of the image", ge=1), crop: str = "fill", blur: int = 100, db: Session = Depends(get_db)):
+@has_role("user")
+async def cloudinary_scaled(image_id: int = Path(description="The ID of the image", ge=1), crop: str = "fill", blur: int = 100, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
-    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    #new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
@@ -76,14 +81,15 @@ async def cloudinary_scaled(image_id: int = Path(description="The ID of the imag
     return new_image
 
 @router.patch("/{image_id}/zoom", response_model=ImageResponseCloudinaryModel)
-async def cloudinary_zoom(image_id: int = Path(description="The ID of the image", ge=1), zoom: float = 1.0, db: Session = Depends(get_db)):
+@has_role("user")
+async def cloudinary_zoom(image_id: int = Path(description="The ID of the image", ge=1), zoom: float = 1.0, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
@@ -98,14 +104,15 @@ async def cloudinary_zoom(image_id: int = Path(description="The ID of the image"
 
 
 @router.patch("/{image_id}/radius", response_model=ImageResponseCloudinaryModel)
-async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), db: Session = Depends(get_db)):
+@has_role("user")
+async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
@@ -120,14 +127,15 @@ async def cloudinary_radius(image_id: int = Path(description="The ID of the imag
 
 #shadow
 @router.patch("/{image_id}/shadow", response_model=ImageResponseCloudinaryModel)
-async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), color: str = "black", x:int = 10, y: int = 10,  db: Session = Depends(get_db)):
+@has_role("user")
+async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), color: str = "black", x:int = 10, y: int = 10, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     cloudinary.config(
         cloud_name=settings.cloudinary_name,
         api_key=settings.cloudinary_api_key,
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
-    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
