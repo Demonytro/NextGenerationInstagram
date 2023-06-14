@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import Depends, HTTPException, status, Request
 
-from src.database.models import User, UserRoleEnum
+from src.database.models import User, UserRole
 from src.services.auth import auth_service
 
 
