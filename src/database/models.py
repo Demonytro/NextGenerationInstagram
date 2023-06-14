@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text, Float
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -80,3 +80,28 @@ class User(Base):
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
     role = Column(String(20), default=UserRole.USER)
+
+
+class Rating(Base):
+    __tablename__ = "rating"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    numbers_rating = Column(Integer)
+    text_rating = Column(String(255))
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    image_id = Column('image_id', ForeignKey(
+        'images.id', ondelete='CASCADE'), default=None)
+    user = relationship('User', backref="rating")
+    image = relationship('Image', backref="rating")
+
+
+class RatingImage(Base):
+    __tablename__ = "rating_image"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    now_number_rating = Column(Float)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    image_id = Column('image_id', ForeignKey(
+        'images.id', ondelete='CASCADE'), default=None)
+    image = relationship('Image', backref="rating_image")

@@ -69,5 +69,22 @@ class ImageResponseCloudinaryModel(BaseModel):
     # user_id: int
 
     class Config():
+        orm_mode = True
 
+class RetingRequestModel(BaseModel):
+    numbers_rating: int
+    text_rating: str
+    user_id: int
+    image_id: int
+
+class RatingResponseModel(BaseModel):
+    id: int
+    numbers_rating: int
+    text_rating: str
+    user_id: int
+    image_id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    class Config:
         orm_mode = True
