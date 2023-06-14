@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -62,3 +62,10 @@ class User(Base):
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
     role = Column(String(20), default=UserRole.USER)
+
+class Qr(Base):
+    __tablename__ = "qr"
+    id = Column(Integer, primary_key=True, index=True)
+    image_id = Column(Integer, ForeignKey('images.id'))
+    image = relationship('Image', backref="qr")
+    qr_code_url = Column(Text)

@@ -1,6 +1,7 @@
 [DEV]
 sqlalchemy_database_url=postgresql+psycopg2://iqcqncxp:rnqklDxfeX7Z1MbT3QxAZYLDUWBsM-0z@lucky.db.elephantsql.com/iqcqncxp
 
+[CLOUD]
 CLOUD_NAME=dauzk4wq6
 CLOUD_API_KEY=537747638174553
 CLOUD_API_SECRET=27cPwALh3jLbhpU9AeEvwMPyBbE

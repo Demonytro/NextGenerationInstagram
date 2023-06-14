@@ -19,6 +19,8 @@ python-multipart = "^0.0.6"
 cloudinary = "^1.33.0"
 pydantic = {extras = ["dotenv"], version = "^1.10.9"}
 alembic = "^1.11.1"
+qrcode = "^7.4.2"
+pillow = "^9.5.0"
 
 
 [build-system]
