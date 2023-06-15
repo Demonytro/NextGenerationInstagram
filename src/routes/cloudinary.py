@@ -2,12 +2,14 @@ from sqlalchemy.orm import Session
 from fastapi.security import HTTPBearer
 import cloudinary
 import cloudinary.uploader
-from database.models import Image, User
-from database.db import get_db
-from configure.config import settings
+from src.database.models import Image, User
+from src.database.db import get_db
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Path
 from sqlalchemy import and_
-from schemas import ImageResponseCloudinaryModel
+from src.schemas import ImageResponseCloudinaryModel
+
+from src.conf.config import config_cloudinary
+
 #--------------01--------------------імпорт декоратора has_role---------------------------------------------
 #--------------02--------------------імпорт auth_service----------------------------------------------------
 
@@ -20,12 +22,7 @@ security = HTTPBearer()
 @router.patch('/{image_id}', response_model=ImageResponseCloudinaryModel)
 @has_role("user")
 async def cloudinary_set(image_id: int = Path(description="The ID of the image", ge=1), file: UploadFile = File(), current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    config_cloudinary()
     new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     # new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
@@ -40,12 +37,7 @@ async def cloudinary_set(image_id: int = Path(description="The ID of the image",
 @router.patch("/{image_id}/cropped", response_model=ImageResponseCloudinaryModel)
 @has_role("user")
 async def cloudinary_cropped(image_id: int = Path(description="The ID of the image", ge=1), height: int = 100, width: int = 100, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    config_cloudinary()
     # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
@@ -62,12 +54,7 @@ async def cloudinary_cropped(image_id: int = Path(description="The ID of the ima
 @router.patch("/{image_id}/scaled", response_model=ImageResponseCloudinaryModel)
 @has_role("user")
 async def cloudinary_scaled(image_id: int = Path(description="The ID of the image", ge=1), crop: str = "fill", blur: int = 100, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    config_cloudinary()
     new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     #new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
@@ -83,12 +70,7 @@ async def cloudinary_scaled(image_id: int = Path(description="The ID of the imag
 @router.patch("/{image_id}/zoom", response_model=ImageResponseCloudinaryModel)
 @has_role("user")
 async def cloudinary_zoom(image_id: int = Path(description="The ID of the image", ge=1), zoom: float = 1.0, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    config_cloudinary()
     #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
@@ -106,12 +88,7 @@ async def cloudinary_zoom(image_id: int = Path(description="The ID of the image"
 @router.patch("/{image_id}/radius", response_model=ImageResponseCloudinaryModel)
 @has_role("user")
 async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    config_cloudinary()
     #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
@@ -129,12 +106,7 @@ async def cloudinary_radius(image_id: int = Path(description="The ID of the imag
 @router.patch("/{image_id}/shadow", response_model=ImageResponseCloudinaryModel)
 @has_role("user")
 async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), color: str = "black", x:int = 10, y: int = 10, current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
-    cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+    config_cloudinary()
     #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
     new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:

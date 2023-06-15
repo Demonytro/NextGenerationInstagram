@@ -6,27 +6,23 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from src.schemas import ImageResponse, ImageUpdateDescriptionRequest, ImageUpdateTagsRequest
-from src.conf.config import settings
+from src.conf.config import settings, config_cloudinary
 from src.database.db import get_db
 from src.database.models import Image, Tag
+from src.services.auth_decorators import has_role
 
 router = APIRouter(prefix="/images", tags=["images"])
 
 
-def config():
-    return cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+
 
 
 @router.post("/", response_model=ImageResponse)
+@has_role("user")
 async def create_image(image: UploadFile = File(...), description: str = None, tags: List[str] = [],
                        db: Session = Depends(get_db)):
     try:
-        config()
+        config_cloudinary()
         uploaded_image = cloudinary.uploader.upload(image.file)
 
         image_url = uploaded_image['secure_url']
@@ -55,6 +51,7 @@ async def create_image(image: UploadFile = File(...), description: str = None, t
 
 
 @router.delete("/{image_id}")
+@has_role("admin")
 async def delete_image(image_id: int, db: Session = Depends(get_db)):
     try:
         image = db.query(Image).filter(Image.id == image_id).first()
@@ -69,9 +66,10 @@ async def delete_image(image_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{image_id}/update-image", response_model=ImageResponse)
+@has_role("user")
 async def update_image_image(image_id: int, image_data: UploadFile = File(...), db: Session = Depends(get_db)):
     try:
-        config()
+        config_cloudinary()
 
         image = db.query(Image).filter(Image.id == image_id).first()
         if not image:
@@ -100,6 +98,7 @@ async def update_image_image(image_id: int, image_data: UploadFile = File(...), 
 
 
 @router.put("/{image_id}/update-tags", response_model=ImageResponse)
+@has_role("user")
 async def update_image_tags(
         image_id: int,
         tags: List[str] = Query(..., description="List of tags to update for the image"),
@@ -134,6 +133,7 @@ async def update_image_tags(
 
 
 @router.put("/{image_id}/update-description", response_model=ImageResponse)
+@has_role("user")
 async def update_image_description(image_id: int, description: ImageUpdateDescriptionRequest,
                                    db: Session = Depends(get_db)):
     try:
@@ -156,6 +156,7 @@ async def update_image_description(image_id: int, description: ImageUpdateDescri
 
 
 @router.get("/{image_id}", response_model=ImageResponse)
+@has_role("user")
 async def get_image(image_id: int, db: Session = Depends(get_db)):
     try:
         image = db.query(Image).filter(Image.id == image_id).first()
@@ -174,6 +175,7 @@ async def get_image(image_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[ImageResponse])
+@has_role("user")
 async def get_images_by_tags(tags: List[str] = Query(...), db: Session = Depends(get_db)):
     try:
         images = db.query(Image).join(Image.tags).filter(Tag.name.in_(tags)).all()
