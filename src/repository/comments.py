@@ -8,7 +8,6 @@ from src.schemas import CommentBase
 
 
 async def create_comment(image_id: int, body: CommentBase, db: Session, user: User) -> Comment:
-
     """
     The create_comment function creates a new comment in the database.
         Args:
