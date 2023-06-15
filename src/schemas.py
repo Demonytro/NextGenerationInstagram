@@ -126,3 +126,22 @@ class UserProfileResponse(BaseModel):
     phone: str
     date_of_birth: date
 
+
+class RatingRequestModel(BaseModel):
+    numbers_rating: int
+    text_rating: str
+    user_id: int
+    image_id: int
+
+
+class RatingResponseModel(BaseModel):
+    id: int
+    numbers_rating: int
+    text_rating: str
+    user_id: int
+    image_id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+
+    class Config:
+        orm_mode = True

@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text, Date
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text, Date, Float
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -105,3 +105,26 @@ class Qr(Base):
     image = relationship('Image', backref="qr")
     qr_code_url = Column(Text)
 
+
+
+class Rating(Base):
+    __tablename__ = "rating"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    numbers_rating = Column(Integer)
+    text_rating = Column(String(255))
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
+    user = relationship('User', backref="rating")
+    image = relationship('Image', backref="rating")
+
+
+class RatingImage(Base):
+    __tablename__ = "rating_image"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    now_number_rating = Column(Float)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
+    image = relationship('Image', backref="rating_image")
