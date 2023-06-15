@@ -7,22 +7,21 @@ from src.database.db import get_db
 from src.schemas import CommentBase, CommentUpdate, CommentModel
 from src.repository import comments as repository_comments
 from src.services.auth import auth_service
-from src.services.roles import RoleChecker
 from src.database.models import User, UserRole
+from src.services.auth_decorators import has_role
 
 router = APIRouter(prefix='/comments', tags=["comments"])
 
 COMM_NOT_FOUND = "Comment not found or not available."
 
-allowed_get_comments = RoleChecker(
-    [UserRole.admin, UserRole.moder, UserRole.user])
-allowed_create_comments = RoleChecker(
-    [UserRole.admin, UserRole.moder, UserRole.user])
-allowed_update_comments = RoleChecker([UserRole.admin, UserRole.moder])
-allowed_remove_comments = RoleChecker([UserRole.admin, UserRole.moder])
+allowed_get_comments = [UserRole.admin, UserRole.moder, UserRole.user]
+allowed_post_comments = [UserRole.admin, UserRole.moder, UserRole.user]
+allowed_put_comments = [UserRole.admin, UserRole.moder]
+allowed_delete_comments = [UserRole.admin, UserRole.moder]
 
 
-@router.post("/new/{post_id}", response_model=CommentModel, dependencies=[Depends(allowed_create_comments)])
+@router.post("/new/{post_id}", response_model=CommentModel)
+@has_role(allowed_post_comments)
 async def create_comment(image_id: int, body: CommentBase, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -40,7 +39,8 @@ async def create_comment(image_id: int, body: CommentBase, db: Session = Depends
     return new_comment
 
 
-@router.get("/single/{comment_id}", response_model=CommentModel, dependencies=[Depends(allowed_get_comments)])
+@router.get("/single/{comment_id}", response_model=CommentModel)
+@has_role(allowed_get_comments)
 async def single_comment(comment_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -62,7 +62,8 @@ async def single_comment(comment_id: int, db: Session = Depends(get_db),
     return comment
 
 
-@router.get("/by_author/{user_id}", response_model=List[CommentModel], dependencies=[Depends(allowed_get_comments)])
+@router.get("/by_author/{user_id}", response_model=List[CommentModel])
+@has_role(allowed_get_comments)
 async def by_user_comments(user_id: int, db: Session = Depends(get_db),
                            current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -86,8 +87,8 @@ async def by_user_comments(user_id: int, db: Session = Depends(get_db),
     return comments
 
 
-@router.get("/image_by_author/{user_id}/{image_id}", response_model=List[CommentModel],
-            dependencies=[Depends(allowed_get_comments)])
+@router.get("/image_by_author/{user_id}/{image_id}", response_model=List[CommentModel])
+@has_role(allowed_get_comments)
 async def by_user_image_comments(user_id: int, image_id: int, db: Session = Depends(get_db),
                                  current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -111,7 +112,8 @@ async def by_user_image_comments(user_id: int, image_id: int, db: Session = Depe
     return comments
 
 
-@router.put("/edit/{comment_id}", response_model=CommentUpdate, dependencies=[Depends(allowed_update_comments)])
+@router.put("/edit/{comment_id}", response_model=CommentUpdate)
+@has_role(allowed_put_comments)
 async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -133,7 +135,8 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends
     return edited_comment
 
 
-@router.delete("/delete/{comment_id}", response_model=CommentModel, dependencies=[Depends(allowed_remove_comments)])
+@router.delete("/delete/{comment_id}", response_model=CommentModel)
+@has_role(allowed_delete_comments)
 async def delete_comment(comment_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """
