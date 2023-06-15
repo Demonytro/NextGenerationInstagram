@@ -6,12 +6,17 @@ from src.schemas import UserModel, UserResponse, TokenModel
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
-from src.database.models import User
+from src.database.models import User, UserRole
 from src.repository import users as repository_users
 from src.services.auth import auth_service
 from src.services.auth_decorators import has_role
+# ---------------------------------------------------------------   class RoleChecker
+from src.services.roles import RolesAccess
+# ---------------------------------------------------------------   class RoleChecker
 from src.schemas import UserDb
 
+
+access_get = RolesAccess([UserRole.ADMIN])
 
 router = APIRouter(prefix='/auth', tags=["auth"])
 security = HTTPBearer()

@@ -45,7 +45,7 @@ async def get_user_rating(user_id: int, db: Session = Depends(get_db)):
 
 @router.delete("/{rating_id}")
 @has_role("admin", "moderator")
-async def delete_rating(image_id: int, user_id: int, db: Session = Depends(get_db))
+async def delete_rating(image_id: int, user_id: int, db: Session = Depends(get_db)):
     new_rating = db.query(Rating).filter(and_(Rating.image_id == image_id, Rating.user_id == user_id)).first()
     if new_rating is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Rating not found!')

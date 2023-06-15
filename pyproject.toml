@@ -25,6 +25,9 @@ email-validator = "^2.0.0.post2"
 pycryptodome = "^3.18.0"
 jose = "^1.0.0"
 
+qrcode = "^7.4.2"
+pillow = "^9.5.0"
+
 
 
 [build-system]
