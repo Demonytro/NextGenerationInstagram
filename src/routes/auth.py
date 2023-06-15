@@ -6,16 +6,17 @@ from src.schemas import UserModel, UserResponse, TokenModel
 from sqlalchemy.orm import Session
 
 from src.database.db import get_db
-from src.database.models import User
+from src.database.models import User, UserRole
 from src.repository import users as repository_users
 from src.services.auth import auth_service
-from src.services.auth_decorators import has_role
+from src.services.roles import RolesAccess
 from src.schemas import UserDb
 
 
 router = APIRouter(prefix='/auth', tags=["auth"])
 security = HTTPBearer()
 
+access_get = RolesAccess([UserRole.ADMIN])
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def signup(body: UserModel, db: Session = Depends(get_db)):
@@ -59,18 +60,15 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
     return current_user
 
-@router.get("/list_of_users")
-@has_role("admin")
+@router.get("/list_of_users", dependencies=Depends(access_get))
 async def list_of_users_route(current_user: User = Depends(auth_service.get_current_user)):
     return {"message": "List of users!"}
 
 @router.get("/test")
-@has_role(["admin", "moderator"])
 async def list_of_users_route(current_user: User = Depends(auth_service.get_current_user)):
     return {"message": "Trying [admin,moderator]!"}
 
 @router.get("/test_for_current_user/{image_id}")
-@has_role(["admin", "moderator"])
 async def test_for_image_id(current_user: User = Depends(auth_service.get_current_user), image_id: int = Path(...), db: Session = Depends(get_db)):
     return {"message": f"Test for image_id!"}
 
