@@ -10,11 +10,8 @@ from sqlalchemy import and_
 from src.schemas import ImageResponseCloudinaryModel
 
 from src.conf.config import config_cloudinary
-
-
-#--------------01--------------------імпорт декоратора has_role---------------------------------------------
-#--------------02--------------------імпорт auth_service----------------------------------------------------
-
+from src.services.auth import auth_service
+from src.services.auth_decorators import has_role
 
 
 router = APIRouter(prefix='/cloudinary', tags=["cloudinary"])
@@ -44,8 +41,8 @@ async def cloudinary_cropped(image_id: int = Path(description="The ID of the ima
 
     config_cloudinary()
 
-    # new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
-    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    # new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
@@ -81,8 +78,8 @@ async def cloudinary_zoom(image_id: int = Path(description="The ID of the image"
 
     config_cloudinary()
 
-    #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
-    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    # new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
@@ -101,8 +98,8 @@ async def cloudinary_radius(image_id: int = Path(description="The ID of the imag
 
     config_cloudinary()
 
-    #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
-    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    # new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
@@ -121,8 +118,8 @@ async def cloudinary_radius(image_id: int = Path(description="The ID of the imag
 
     config_cloudinary()
 
-    #new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
-    new_image = db.query(Image).filter((Image.id == image_id)).first()
+    new_image = db.query(Image).filter(and_(Image.id == image_id, Image.user_id == current_user.id)).first()
+    # new_image = db.query(Image).filter((Image.id == image_id)).first()
     if new_image is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Not found')
     try:
