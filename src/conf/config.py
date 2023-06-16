@@ -21,3 +21,5 @@ def config_cloudinary():
         api_secret=settings.cloudinary_api_secret,
         secure=True
     )
+
+settings = Settings()
