@@ -14,10 +14,10 @@ router = APIRouter(prefix='/comments', tags=["comments"])
 
 COMM_NOT_FOUND = "Comment not found or not available."
 
-allowed_get_comments = [UserRole.admin, UserRole.moder, UserRole.user]
-allowed_post_comments = [UserRole.admin, UserRole.moder, UserRole.user]
-allowed_put_comments = [UserRole.admin, UserRole.moder]
-allowed_delete_comments = [UserRole.admin, UserRole.moder]
+allowed_get_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
+allowed_post_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
+allowed_put_comments = [UserRole.ADMIN, UserRole.MODERATOR]
+allowed_delete_comments = [UserRole.ADMIN, UserRole.MODERATOR]
 
 
 @router.post("/new/{post_id}", response_model=CommentModel)
