@@ -46,6 +46,9 @@ app.include_router(comments.router, prefix='/api')
 
 #маршрут з автентифікацією
 app.include_router(auth.router, prefix="/api")
+app.include_router(rating.router, prefix="/api")
+app.include_router(qr.router, prefix="/api")
+app.include_router(cloudinary.router, prefix="/api")
 
 
 if __name__ == '__main__':

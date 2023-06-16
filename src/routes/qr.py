@@ -7,16 +7,21 @@ from src.database.models import Image, Qr
 from io import BytesIO
 from src.database.db import get_db
 import os
-from src.conf.config import settings
+from src.conf.config import settings, config_cloudinary
 
 router = APIRouter(prefix='/qr', tags=["qr"])
-
-cloudinary.config(
-        cloud_name=settings.cloudinary_name,
-        api_key=settings.cloudinary_api_key,
-        api_secret=settings.cloudinary_api_secret,
-        secure=True
-    )
+# ------------------------------------------------------------???????????????????
+# cloudinary.config(
+#         cloud_name=settings.cloudinary_name,
+#         api_key=settings.cloudinary_api_key,
+#         api_secret=settings.cloudinary_api_secret,
+#         secure=True
+#     )
+try:
+    config_cloudinary()
+#    upload_result = cloudinary.uploader.upload(qr_code_bytes, folder="qrs")
+except Exception as e:
+    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.post("/generate_qr_code")
 def generate_qr_code_and_upload_to_cloudinary(image_id, db: Session = Depends(get_db)):

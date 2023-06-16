@@ -3,6 +3,7 @@
 alembic*
 *.pyc
 __pycache__*
+env
 
 
 # Logs
