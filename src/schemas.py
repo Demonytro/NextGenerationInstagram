@@ -14,7 +14,6 @@ class ImageCreateRequest(BaseModel):
 
 class ImageUpdateRequest(BaseModel):
     description: str
-    # <<<<<<< Polina
     tags: conlist(constr(max_length=50), min_items=1, max_items=5) = []
 
 
@@ -24,6 +23,9 @@ class ImageResponse(BaseModel):
     description: str
     tags: conlist(constr(max_length=50), min_items=1, max_items=5) = []
     comments: List[str] = []
+
+    class Config:
+        orm_mode = True
 
 
 class ImageUpdateImageRequest(BaseModel):
@@ -98,6 +100,9 @@ class UserResponse(BaseModel):
     user: UserDb
     detail: str = "User successfully created"
 
+    class Config:
+        orm_mode = True
+
 
 class TokenModel(BaseModel):
     access_token: str
@@ -125,6 +130,9 @@ class UserProfileResponse(BaseModel):
     email: EmailStr
     phone: str
     date_of_birth: date
+
+    class Config:
+        orm_mode = True
 
 
 class RatingRequestModel(BaseModel):
