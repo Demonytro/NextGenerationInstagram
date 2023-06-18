@@ -18,13 +18,14 @@
 from typing import List
 
 from fastapi import Request, Depends, HTTPException, status
+from cloudinary.provisioning import UserRole   #  ----------, Role
 
 from src.database.models import User, UserRole   #  ----------, Role
 from src.services.auth import auth_service
 
 
 class RolesAccess:
-    def __init__(self, allowed_roles: List[Role]):
+    def __init__(self, allowed_roles: List[UserRole]):
         self.allowed_roles = allowed_roles
 
     async def __call__(self, request: Request, current_user: User = Depends(auth_service.get_current_user)):

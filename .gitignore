@@ -1,9 +1,12 @@
 *.env
-.idea
+.idea*
 alembic*
 *.pyc
-__pycache__*
+__pycache__
 env
+*.idea*
+
+
 
 
 # Logs

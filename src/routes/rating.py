@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 from fastapi.security import HTTPBearer
-from database.models import User, Rating, Image, RatingImage
-from database.db import get_db
-from configure.config import settings
+from src.database.models import User, Rating, Image, RatingImage
+from src.database.db import get_db
+from src.conf.config import settings
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Path
 from sqlalchemy import and_
-from schemas import RatingResponseModel, RatingRequestModel
+from src.schemas import RatingResponseModel, RatingRequestModel
 from typing import List
 from src.repository.rating import calculate_total_rating
 from src.services.auth import auth_service
@@ -13,9 +13,11 @@ from src.services.auth_decorators import has_role
 
 router = APIRouter(prefix='/rating', tags=["rating"])
 
+
 @router.post("/", response_model=RatingResponseModel)
 @has_role("user")
-async def create_rating(body: RatingRequestModel, image_id: int, db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
+async def create_rating(body: RatingRequestModel, image_id: int, db: Session = Depends(get_db),
+                        current_user: User = Depends(auth_service.get_current_user)):
     new_rating = db.query(Rating).filter(and_(Rating.image_id == image_id, Rating.user_id == current_user.id)).first()
     if new_rating:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="This rating is exists!")
@@ -28,8 +30,9 @@ async def create_rating(body: RatingRequestModel, image_id: int, db: Session = D
     db.add(new_rating)
     db.commit()
     db.refresh(new_rating)
-    await calculate_total_rating(image_id=image_id, db = db)
+    await calculate_total_rating(image_id=image_id, db=db)
     return new_rating
+
 
 @router.get("/{image_id}", response_model=List[RatingResponseModel])
 @has_role(["admin", "moderator"])
@@ -46,6 +49,7 @@ async def get_image_rating(image_id: int, db: Session = Depends(get_db)):
 async def get_user_rating(user_id: int, db: Session = Depends(get_db)):
     list_rating = db.query(Rating).filter(Rating.user_id == user_id).all()
     return list_rating
+
 
 @router.delete("/{rating_id}")
 @has_role(["admin", "moderator"])

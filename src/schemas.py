@@ -24,6 +24,7 @@ class ImageResponse(BaseModel):
     tags: conlist(constr(max_length=50), min_items=1, max_items=5) = []
     comments: List[str] = []
 
+    # возможно стоит тут добавить поле rating если да то и в search_filtering тоже
     class Config:
         orm_mode = True
 

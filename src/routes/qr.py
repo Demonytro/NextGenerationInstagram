@@ -1,4 +1,5 @@
 import qrcode
+from starlette import status
 import cloudinary
 import cloudinary.uploader
 from sqlalchemy.orm import Session
@@ -10,6 +11,7 @@ import os
 from src.conf.config import settings, config_cloudinary
 
 router = APIRouter(prefix='/qr', tags=["qr"])
+
 # ------------------------------------------------------------???????????????????
 # cloudinary.config(
 #         cloud_name=settings.cloudinary_name,

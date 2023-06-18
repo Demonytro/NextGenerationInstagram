@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from src.database.db import get_db
 
 
-from src.routes import auth, images, comments, rating, cloudinary
+from src.routes import auth, images, comments, rating, cloudinary, qr
 
 
 app = FastAPI()
@@ -49,6 +49,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(rating.router, prefix="/api")
 app.include_router(qr.router, prefix="/api")
 app.include_router(cloudinary.router, prefix="/api")
+app.include_router(search_filtering.router, prefix="/api")
 
 
 if __name__ == '__main__':

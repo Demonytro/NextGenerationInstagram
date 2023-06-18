@@ -15,13 +15,17 @@ class Image(Base):
     image = Column(String, nullable=False)
     description = Column(String)
     tags = relationship('Tag', secondary='image_tag')
-    comments = relationship('Comment', backref='image')
+
+    # нужен ??? - comment_id
+    comment_id = Column('comment_id', ForeignKey('comments.id', ondelete='CASCADE'), default=None)
+    comments = relationship('Comment', backref='images')    # ----------------  images
+
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    user = relationship('User', backref="images")  # ----------------  images
 
-    user = relationship('User', backref="image")
     is_active = Column(Boolean, default=True)
 
 
@@ -45,6 +49,7 @@ class Comment(Base):
 
     user = relationship('User', backref="comments")
     image = relationship('Image', backref="comments")
+
 # =======
 #     image_id = Column(Integer, ForeignKey('images.id'))
 #     content = Column(String, nullable=False)
@@ -66,6 +71,11 @@ class UserRole(str, Enum):
     MODERATOR = "moderator"
     ADMIN = "admin"
 
+# class UserRole(enum.Enum):
+#     admin: str = 'admin'
+#     moderator: str = 'moderator'
+#     user: str = 'user'
+
 
 class User(Base):
     __tablename__ = "users"
@@ -77,7 +87,10 @@ class User(Base):
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
 
+    # role = Column(String(20), default=UserRole.user)
     role = Column(String(20), default=UserRole.USER)
+
+#     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
 class BlacklistToken(Base):
@@ -95,7 +108,8 @@ class UserProfile(Base):
     email = Column(String(50))
     phone = Column(String(50))
     date_of_birth = Column(Date)
-    user = relationship('User', backref='profile')
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    user = relationship('User', backref='user_profiles')  #----user_profiles------------profile-----------------
 
 
 class Qr(Base):
@@ -104,7 +118,6 @@ class Qr(Base):
     image_id = Column(Integer, ForeignKey('images.id'))
     image = relationship('Image', backref="qr")
     qr_code_url = Column(Text)
-
 
 
 class Rating(Base):
@@ -128,3 +141,10 @@ class RatingImage(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
     image = relationship('Image', backref="rating_image")
+
+
+#  -------- Daniil ----- Begin ----
+#  -------- Daniil ----- End   ----
+
+#  -------- Polina ----- Begin ----
+#  -------- Polina ----- End ----
