@@ -5,8 +5,8 @@ from fastapi import APIRouter, HTTPException, Depends, Query, UploadFile, File
 from sqlalchemy.orm import Session
 from starlette import status
 
-from src.schemas import ImageResponse, ImageUpdateDescriptionRequest, ImageUpdateTagsRequest
-from src.conf.config import settings, config_cloudinary
+from src.schemas import ImageResponse, ImageUpdateDescriptionRequest
+from src.conf.config import config_cloudinary
 from src.database.db import get_db
 from src.database.models import Image, Tag
 from src.services.auth_decorators import has_role

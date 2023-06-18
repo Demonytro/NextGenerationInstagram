@@ -12,11 +12,11 @@ from src.services.auth import auth_service
 from src.services.auth_decorators import has_role
 # ---------------------------------------------------------------   class RoleChecker
 from src.services.roles import RolesAccess
-# ---------------------------------------------------------------   class RoleChecker
+# # ---------------------------------------------------------------   class RoleChecker
 from src.schemas import UserDb
 
 
-access_get = RolesAccess([UserRole.ADMIN])
+# access_get = RolesAccess([UserRole.ADMIN])
 
 router = APIRouter(prefix='/auth', tags=["auth"])
 security = HTTPBearer()
