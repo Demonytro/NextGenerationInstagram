@@ -14,7 +14,7 @@ from src.repository import users as repository_users
 
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    SECRET_KEY = "secret_key"
+    SECRET_KEY = "secret_key"  # Возможно стоит эту и следующую строчку положить в энв файл
     ALGORITHM = "HS256"
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -72,7 +72,7 @@ class Auth:
                     raise credentials_exception
             else:
                 raise credentials_exception
-        except JWTError as e:
+        except JWTError as e:  # зачем тут as e если е в дальнейшем не используется ?
             raise credentials_exception
 
         user = await repository_users.get_user_by_email(email, db)

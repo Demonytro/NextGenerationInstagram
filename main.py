@@ -9,8 +9,7 @@ from sqlalchemy.orm import Session
 from src.database.db import get_db
 
 
-from src.routes import auth, images, comments, rating, cloudinary
-
+from src.routes import auth, images, comments, rating, cloudinary, qr, search_filtering
 
 app = FastAPI()
 
@@ -32,8 +31,6 @@ def healthchecker(db: Session = Depends(get_db)):
             raise HTTPException(
                 status_code=500, detail="Database is not configured correctly")
 
-            raise HTTPException(status_code=500, detail="Database is not configured correctly")
-
         return {"message": "Welcome to FastAPI!"}
     except Exception as e:
         print(e)
@@ -49,7 +46,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(rating.router, prefix="/api")
 app.include_router(qr.router, prefix="/api")
 app.include_router(cloudinary.router, prefix="/api")
-
+app.include_router(search_filtering.router, prefix="/api")
 
 if __name__ == '__main__':
     uvicorn.run(app, host='localhost', port=8000)

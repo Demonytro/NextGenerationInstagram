@@ -1,4 +1,6 @@
 import qrcode
+from starlette import status
+
 import cloudinary
 import cloudinary.uploader
 from sqlalchemy.orm import Session

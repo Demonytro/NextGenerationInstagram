@@ -21,7 +21,7 @@ class Image(Base):
 
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
 
-    user = relationship('User', backref="image")
+    user = relationship('User', backref="images")
     is_active = Column(Boolean, default=True)
 
 

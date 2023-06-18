@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi.security import HTTPBearer
-from database.models import User, Rating, Image, RatingImage
-from database.db import get_db
-from configure.config import settings
+from src.database.models import User, Rating, Image, RatingImage
+from src.database.db import get_db
 from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Path
 from sqlalchemy import and_
-from schemas import RatingResponseModel, RatingRequestModel
+from src.schemas import RatingResponseModel, RatingRequestModel
 from typing import List
 from src.repository.rating import calculate_total_rating
 from src.services.auth import auth_service

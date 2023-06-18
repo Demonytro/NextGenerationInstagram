@@ -17,6 +17,7 @@
 
 from typing import List
 
+from cloudinary.provisioning import Role
 from fastapi import Request, Depends, HTTPException, status
 
 from src.database.models import User, UserRole   #  ----------, Role
