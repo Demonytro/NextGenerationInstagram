@@ -8,7 +8,7 @@ alembic*
 
 __pycache__
 
-env
+.env
 
 *.idea*
 

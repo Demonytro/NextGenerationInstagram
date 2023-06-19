@@ -3,7 +3,8 @@ from pydantic import BaseSettings
 
 
 class Settings(BaseSettings):
-    sqlalchemy_database_url: str = "postgresql+psycopg2://postgres:567234@localhost:5432/postgres"
+    sqlalchemy_database_url: str
+    #= "postgresql+psycopg2://postgres:567234@localhost:5432/postgres"
     cloudinary_name = "cloud_name"
     cloudinary_api_key = "0000000000"
     cloudinary_api_secret = "secret"
