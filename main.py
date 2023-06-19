@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from src.database.db import get_db
 
 
-from src.routes import auth, images, comments, rating, cloudinary, qr
+from src.routes import auth, images, comments, rating, cloudinary, qr, search_filtering
 
 
 app = FastAPI()
