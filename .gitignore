@@ -1,9 +1,15 @@
 *.env
+
 .idea*
+
 alembic*
+
 *.pyc
+
 __pycache__
+
 env
+
 *.idea*
 
 
