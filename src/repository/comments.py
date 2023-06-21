@@ -6,6 +6,9 @@ from sqlalchemy import and_, func
 from src.database.models import User, Comment, UserRole
 from src.schemas import CommentBase
 
+from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
+    allowed_delete_comments
+
 
 async def create_comment(image_id: int, body: CommentBase, db: Session, user: User) -> Comment:
     """
@@ -30,7 +33,6 @@ async def create_comment(image_id: int, body: CommentBase, db: Session, user: Us
 
 
 async def show_single_comment(comment_id: int, db: Session, user: User) -> Comment | None:
-
     """
     The show_single_comment function returns a single comment from the database.
         Args:
@@ -47,7 +49,6 @@ async def show_single_comment(comment_id: int, db: Session, user: User) -> Comme
 
 
 async def show_user_comments(user_id: int, db: Session) -> List[Comment] | None:
-
     """
     The show_user_comments function returns a list of comments made by the user with the given id.
         If no such user exists, it returns None.
@@ -60,7 +61,6 @@ async def show_user_comments(user_id: int, db: Session) -> List[Comment] | None:
 
 
 async def show_user_image_comments(user_id: int, image_id: int, db: Session) -> List[Comment] | None:
-
     """
     The show_user_image_comments function returns a list of comments for a given user and image.
         Args:
@@ -76,7 +76,6 @@ async def show_user_image_comments(user_id: int, image_id: int, db: Session) -> 
 
 
 async def edit_comment(comment_id: int, body: CommentBase, db: Session, user: User) -> Comment | None:
-
     """
     The edit_comment function allows a user to edit their own comment.
         Args:
@@ -91,7 +90,7 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session, user: Us
     """
     comment = db.query(Comment).filter(Comment.id == comment_id).first()
     if comment:
-        if user.role in [UserRole.admin, UserRole.moder] or comment.user_id == user.id:
+        if user.role in allowed_put_comments or comment.user_id == user.id:
             comment.text = body.text
             comment.updated_at = func.now()
             comment.update_status = True
@@ -100,7 +99,6 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session, user: Us
 
 
 async def delete_comment(comment_id: int, db: Session, user: User) -> None:
-
     """
     The delete_comment function deletes a comment from the database.
         Args:
@@ -115,6 +113,7 @@ async def delete_comment(comment_id: int, db: Session, user: User) -> None:
     """
     comment = db.query(Comment).filter(Comment.id == comment_id).first()
     if comment:
-        db.delete(comment)
-        db.commit()
+        if user.role in allowed_put_comments:
+            db.delete(comment)
+            db.commit()
     return comment

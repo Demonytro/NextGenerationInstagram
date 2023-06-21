@@ -1,16 +1,18 @@
+import pickle
 from typing import Optional
 
+import redis
 from jose import JWTError, jwt
-
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from src.conf.config import settings, config_cloudinary
 from src.database.db import get_db
 from src.repository import users as repository_users
+from src.conf.config import settings
+from src.conf import messages
 
 
 class Auth:

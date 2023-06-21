@@ -16,14 +16,14 @@ router = APIRouter(prefix='/comments', tags=["comments"])
 
 COMM_NOT_FOUND = "Comment not found or not available."
 
-# allowed_get_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
-# allowed_post_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
-# allowed_put_comments = [UserRole.ADMIN, UserRole.MODERATOR]
-# allowed_delete_comments = [UserRole.ADMIN, UserRole.MODERATOR]
+# allowed_get_comments = [UserRole.user]
+# allowed_post_comments = [UserRole.admin, UserRole.moderator, UserRole.user]
+# allowed_put_comments = [UserRole.admin, UserRole.moderator]
+# allowed_delete_comments = [UserRole.admin]
 
 
 @router.post("/new/{post_id}", response_model=CommentModel)
-@has_role(allowed_post_comments)
+# @has_role(UserRole.user)
 async def create_comment(image_id: int, body: CommentBase, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -42,7 +42,7 @@ async def create_comment(image_id: int, body: CommentBase, db: Session = Depends
 
 
 @router.get("/single/{comment_id}", response_model=CommentModel)
-@has_role(allowed_get_comments)
+# @has_role(allowed_get_comments)
 async def single_comment(comment_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -65,7 +65,7 @@ async def single_comment(comment_id: int, db: Session = Depends(get_db),
 
 
 @router.get("/by_author/{user_id}", response_model=List[CommentModel])
-@has_role(allowed_get_comments)
+# @has_role(allowed_get_comments)
 async def by_user_comments(user_id: int, db: Session = Depends(get_db),
                            current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -90,7 +90,7 @@ async def by_user_comments(user_id: int, db: Session = Depends(get_db),
 
 
 @router.get("/image_by_author/{user_id}/{image_id}", response_model=List[CommentModel])
-@has_role(allowed_get_comments)
+# @has_role(allowed_get_comments)
 async def by_user_image_comments(user_id: int, image_id: int, db: Session = Depends(get_db),
                                  current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -115,7 +115,7 @@ async def by_user_image_comments(user_id: int, image_id: int, db: Session = Depe
 
 
 @router.put("/edit/{comment_id}", response_model=CommentUpdate)
-@has_role(allowed_put_comments)
+# @has_role(allowed_put_comments)
 async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -138,7 +138,7 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends
 
 
 @router.delete("/delete/{comment_id}", response_model=CommentModel)
-@has_role(allowed_delete_comments)
+# @has_role(allowed_delete_comments)
 async def delete_comment(comment_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """

@@ -1,7 +1,7 @@
-from datetime import datetime
-from enum import Enum
+import enum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text, Date, Float
+from datetime import datetime
+from sqlalchemy import Column, Integer, String, ForeignKey, Table, DateTime, func, Boolean, Text, Date, Float, Enum
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -9,72 +9,21 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 
-class Image(Base):
-    __tablename__ = 'images'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    image = Column(String, nullable=False)
-    description = Column(String)
-    tags = relationship('Tag', secondary='image_tag')
-
-    # нужен ??? - comment_id
-    # comment_id = Column('comment_id', ForeignKey('comments.id', ondelete='CASCADE'), default=None)
-    # comments = relationship('Comment', backref='images')    # ----------------  images
-
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
-    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
-    user = relationship('User', backref="images")  # ----------------  images
-
-    is_active = Column(Boolean, default=True)
+class UserRole(str, enum.Enum):
+    admin: str = 'admin'
+    moderator: str = 'moderator'
+    user: str = 'user'
 
 
-class Tag(Base):
-    __tablename__ = 'tags'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    name = Column(String, unique=True, nullable=False)
-    images = relationship('Image', secondary='image_tag')
+    # class UserRole(str, Enum):
+    #     USER = "user"
+    #     MODERATOR = "moderator"
+    #     ADMIN = "admin"
 
-
-class Comment(Base):
-    __tablename__ = 'comments'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-
-    text = Column(Text, nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
-    image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
-    update_status = Column(Boolean, default=False)
-
-    user = relationship('User', backref="comments")
-    image = relationship('Image', backref="comments")
-
-# =======
-#     image_id = Column(Integer, ForeignKey('images.id'))
-#     content = Column(String, nullable=False)
-#     created_at = Column(DateTime, default=datetime.now)
-#     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-# >>>>>>> dev
-
-
-image_tag = Table(
-    'image_tag',
-    Base.metadata,
-    Column('image_id', Integer, ForeignKey('images.id'), primary_key=True),
-    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True)
-)
-
-
-class UserRole(str, Enum):
-    USER = "user"
-    MODERATOR = "moderator"
-    ADMIN = "admin"
-
-# class UserRole(enum.Enum):
-#     admin: str = 'admin'
-#     moderator: str = 'moderator'
-#     user: str = 'user'
+allowed_get_comments = [UserRole.user]
+allowed_post_comments = [UserRole.admin, UserRole.moderator, UserRole.user]
+allowed_put_comments = [UserRole.admin, UserRole.moderator]
+allowed_delete_comments = [UserRole.admin]
 
 
 class User(Base):
@@ -87,10 +36,10 @@ class User(Base):
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
 
-    # role = Column(String(20), default=UserRole.user)
-    role = Column(String(20), default=UserRole.USER)
+    role = Column('role', Enum(UserRole), default=UserRole.user)
+    # role = Column(String(20), default=UserRole.USER)
 
-    # confirmed = Column(Boolean, default=False)
+    confirmed = Column(Boolean, default=False)   # ------------------------------  False
 
 
 class BlacklistToken(Base):
@@ -100,28 +49,28 @@ class BlacklistToken(Base):
 
 
 class UserProfile(Base):
-    __tablename__ = 'user_profiles'
+    __tablename__ = 'users_profiles'
     id = Column(Integer, primary_key=True)
-    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), unique=True, nullable=False)
     first_name = Column(String(50))
     last_name = Column(String(50))
     email = Column(String(50))
     phone = Column(String(50))
-    date_of_birth = Column(Date)
-    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
-    user = relationship('User', backref='user_profiles')  #----user_profiles------------profile-----------------
+    # date_of_birth = Column(Date)
+    date_of_birth = Column(String(50))
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), unique=True, nullable=False)
+    user = relationship('User', backref='user_profiles')
 
 
 class Qr(Base):
-    __tablename__ = "qr"
+    __tablename__ = "qrs"
     id = Column(Integer, primary_key=True, index=True)
-    image_id = Column(Integer, ForeignKey('images.id'))
-    image = relationship('Image', backref="qr")
+    image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
+    image = relationship('Image', backref="qrs")
     qr_code_url = Column(Text)
 
 
 class Rating(Base):
-    __tablename__ = "rating"
+    __tablename__ = "ratings"
     id = Column(Integer, primary_key=True, autoincrement=True)
     numbers_rating = Column(Integer)
     text_rating = Column(String(255))
@@ -129,22 +78,59 @@ class Rating(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
     image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
-    user = relationship('User', backref="rating")
-    image = relationship('Image', backref="rating")
+    user = relationship('User', backref="ratings")
+    image = relationship('Image', backref="ratings")
 
 
 class RatingImage(Base):
-    __tablename__ = "rating_image"
+    __tablename__ = "ratings_images"
     id = Column(Integer, primary_key=True, autoincrement=True)
     now_number_rating = Column(Float)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
-    image = relationship('Image', backref="rating_image")
+    image = relationship('Image', backref="ratings_images")
 
 
-#  -------- Daniil ----- Begin ----
-#  -------- Daniil ----- End   ----
+class Image(Base):
+    __tablename__ = 'images'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    image = Column(String, nullable=False)
+    description = Column(String)
+    tags = relationship('Tag', secondary='image_tag')
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    is_active = Column(Boolean, default=True)
 
-#  -------- Polina ----- Begin ----
-#  -------- Polina ----- End ----
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    user = relationship('User', backref="users")
+
+
+class Tag(Base):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    name = Column(String, unique=True, nullable=False)
+    images = relationship('Image', secondary='image_tag')
+
+
+image_tag = Table(
+    'image_tag',
+    Base.metadata,
+    Column('image_id', Integer, ForeignKey('images.id'), primary_key=True),
+    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True)
+)
+
+
+class Comment(Base):
+    __tablename__ = 'comments'
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+
+    text = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    update_status = Column(Boolean, default=False)
+
+    user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
+    user = relationship('User', backref="comments")
+    image_id = Column('image_id', ForeignKey('images.id', ondelete='CASCADE'), default=None)
+    image = relationship('Image', backref="comments")
