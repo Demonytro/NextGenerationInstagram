@@ -8,22 +8,15 @@ from src.schemas import CommentBase, CommentUpdate, CommentModel
 from src.repository import comments as repository_comments
 from src.services.auth import auth_service
 from src.database.models import User, UserRole
-from src.services.auth_decorators import has_role
-from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
-    allowed_delete_comments
+
+from src.services.roles import *
 
 router = APIRouter(prefix='/comments', tags=["comments"])
 
 COMM_NOT_FOUND = "Comment not found or not available."
 
-# allowed_get_comments = [UserRole.user]
-# allowed_post_comments = [UserRole.admin, UserRole.moderator, UserRole.user]
-# allowed_put_comments = [UserRole.admin, UserRole.moderator]
-# allowed_delete_comments = [UserRole.admin]
 
-
-@router.post("/new/{post_id}", response_model=CommentModel)
-# @has_role(UserRole.user)
+@router.post("/new/{post_id}", response_model=CommentModel, dependencies=[Depends(access_user)])
 async def create_comment(image_id: int, body: CommentBase, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """
@@ -114,7 +107,7 @@ async def by_user_image_comments(user_id: int, image_id: int, db: Session = Depe
     return comments
 
 
-@router.put("/edit/{comment_id}", response_model=CommentUpdate)
+@router.put("/edit/{comment_id}", response_model=CommentUpdate, dependencies=[Depends(access_all)])
 # @has_role(allowed_put_comments)
 async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)):
@@ -137,8 +130,7 @@ async def edit_comment(comment_id: int, body: CommentBase, db: Session = Depends
     return edited_comment
 
 
-@router.delete("/delete/{comment_id}", response_model=CommentModel)
-# @has_role(allowed_delete_comments)
+@router.delete("/delete/{comment_id}", response_model=CommentModel, dependencies=[Depends(access_admin_moderator)])
 async def delete_comment(comment_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)):
     """

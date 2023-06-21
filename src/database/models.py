@@ -15,17 +15,6 @@ class UserRole(str, enum.Enum):
     user: str = 'user'
 
 
-    # class UserRole(str, Enum):
-    #     USER = "user"
-    #     MODERATOR = "moderator"
-    #     ADMIN = "admin"
-
-allowed_get_comments = [UserRole.user]
-allowed_post_comments = [UserRole.admin, UserRole.moderator, UserRole.user]
-allowed_put_comments = [UserRole.admin, UserRole.moderator]
-allowed_delete_comments = [UserRole.admin]
-
-
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -35,11 +24,9 @@ class User(Base):
     username = Column(String(50))
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
-
     role = Column('role', Enum(UserRole), default=UserRole.user)
-    # role = Column(String(20), default=UserRole.USER)
 
-    confirmed = Column(Boolean, default=False)   # ------------------------------  False
+    confirmed = Column(Boolean, default=False)  # ------------------------------  False
 
 
 class BlacklistToken(Base):

@@ -9,15 +9,12 @@ from src.schemas import RatingResponseModel, RatingRequestModel
 from typing import List
 from src.repository.rating import calculate_total_rating
 from src.services.auth import auth_service
-from src.services.auth_decorators import has_role
-from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
-    allowed_delete_comments
+from src.services.roles import *
 
 router = APIRouter(prefix='/rating', tags=["rating"])
 
 
-@router.post("/", response_model=RatingResponseModel)
-# @has_role(allowed_get_comments)
+@router.post("/", response_model=RatingResponseModel, dependencies=[Depends(access_all)])
 async def create_rating(body: RatingRequestModel, image_id: int, db: Session = Depends(get_db),
                         current_user: User = Depends(auth_service.get_current_user)):
     new_rating = db.query(Rating).filter(and_(Rating.image_id == image_id, Rating.user_id == current_user.id)).first()
@@ -36,8 +33,7 @@ async def create_rating(body: RatingRequestModel, image_id: int, db: Session = D
     return new_rating
 
 
-@router.get("/{image_id}", response_model=List[RatingResponseModel])
-# @has_role(allowed_put_comments)
+@router.get("/{image_id}", response_model=List[RatingResponseModel], dependencies=[Depends(access_all)])
 async def get_image_rating(image_id: int, db: Session = Depends(get_db)):
     image_r = db.query(Image).filter(Image.id == image_id).first()
     if image_r is None:
@@ -46,8 +42,7 @@ async def get_image_rating(image_id: int, db: Session = Depends(get_db)):
     return list_rating
 
 
-@router.get("/users/{user_id}", response_model=List[RatingResponseModel])
-# @has_role(allowed_put_comments)
+@router.get("/users/{user_id}", response_model=List[RatingResponseModel], dependencies=[Depends(access_all)])
 async def get_user_rating(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
@@ -56,8 +51,7 @@ async def get_user_rating(user_id: int, db: Session = Depends(get_db)):
     return list_rating_users
 
 
-@router.delete("/")
-# @has_role(allowed_put_comments)
+@router.delete("/", dependencies=[Depends(access_admin_moderator)])
 async def delete_rating(image_id: int, user_id: int, db: Session = Depends(get_db)):
     new_rating = db.query(Rating).filter(and_(Rating.image_id == image_id, Rating.user_id == user_id)).first()
     if new_rating is None:

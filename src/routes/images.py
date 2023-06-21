@@ -11,16 +11,12 @@ from src.conf.config import settings, config_cloudinary
 from src.database.db import get_db
 from src.database.models import Image, Tag, User, Rating
 from src.services.auth import auth_service
-from src.services.auth_decorators import has_role
-from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
-    allowed_delete_comments
-
+from src.services.roles import *
 
 router = APIRouter(prefix="/images", tags=["images"])
 
 
-@router.post("/", response_model=ImageResponse)
-# @has_role(allowed_get_comments)
+@router.post("/", response_model=ImageResponse, dependencies=[Depends(access_user_admin)])
 async def create_image(image: UploadFile = File(...), description: str = None, tags: List[str] = [],
                        db: Session = Depends(get_db), current_user: User = Depends(auth_service.get_current_user)):
     try:
@@ -53,8 +49,7 @@ async def create_image(image: UploadFile = File(...), description: str = None, t
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.delete("/{image_id}")
-# @has_role(allowed_delete_comments)
+@router.delete("/{image_id}", dependencies=[Depends(access_all)])
 async def delete_image(image_id: int, db: Session = Depends(get_db)):
     try:
         image = db.query(Image).filter(Image.id == image_id).first()
@@ -68,8 +63,7 @@ async def delete_image(image_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.put("/{image_id}/update-image", response_model=ImageResponse)
-# @has_role(allowed_get_comments)
+@router.put("/{image_id}/update-image", response_model=ImageResponse, dependencies=[Depends(access_all)])
 async def update_image_image(image_id: int, image_data: UploadFile = File(...), db: Session = Depends(get_db)):
     try:
         config_cloudinary()
@@ -100,8 +94,7 @@ async def update_image_image(image_id: int, image_data: UploadFile = File(...), 
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/{image_id}/update-tags", response_model=ImageResponse)
-# @has_role(allowed_get_comments)
+@router.put("/{image_id}/update-tags", response_model=ImageResponse, dependencies=[Depends(access_all)])
 async def update_image_tags(
         image_id: int,
         tags: List[str] = Query(..., description="List of tags to update for the image"),
@@ -134,8 +127,7 @@ async def update_image_tags(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/{image_id}/update-description", response_model=ImageResponse)
-# @has_role(allowed_get_comments)
+@router.put("/{image_id}/update-description", response_model=ImageResponse, dependencies=[Depends(access_all)])
 async def update_image_description(image_id: int, description: ImageUpdateDescriptionRequest,
                                    db: Session = Depends(get_db)):
     try:

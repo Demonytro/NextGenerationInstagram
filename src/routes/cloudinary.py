@@ -11,16 +11,14 @@ from src.schemas import ImageResponseCloudinaryModel
 
 from src.conf.config import config_cloudinary
 from src.services.auth import auth_service
-from src.services.auth_decorators import has_role
-from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
-    allowed_delete_comments
+from src.services.roles import *
+
 
 router = APIRouter(prefix='/cloudinary', tags=["cloudinary"])
 security = HTTPBearer()
 
 
-@router.patch('/{image_id}', response_model=ImageResponseCloudinaryModel)
-# @has_role(allowed_get_comments)
+@router.patch('/{image_id}', response_model=ImageResponseCloudinaryModel, dependencies=[Depends(access_all)])
 async def cloudinary_set(image_id: int = Path(description="The ID of the image", ge=1), file: UploadFile = File(),
                          current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     config_cloudinary()
@@ -38,8 +36,7 @@ async def cloudinary_set(image_id: int = Path(description="The ID of the image",
     return new_image
 
 
-@router.patch("/{image_id}/cropped", response_model=ImageResponseCloudinaryModel)
-# @has_role(allowed_get_comments)
+@router.patch("/{image_id}/cropped", response_model=ImageResponseCloudinaryModel, dependencies=[Depends(access_all)])
 async def cloudinary_cropped(image_id: int = Path(description="The ID of the image", ge=1), height: int = 100,
                              width: int = 100, current_user: User = Depends(auth_service.get_current_user),
                              db: Session = Depends(get_db)):
@@ -60,8 +57,7 @@ async def cloudinary_cropped(image_id: int = Path(description="The ID of the ima
     return new_image
 
 
-@router.patch("/{image_id}/scaled", response_model=ImageResponseCloudinaryModel)
-# @has_role(allowed_get_comments)
+@router.patch("/{image_id}/scaled", response_model=ImageResponseCloudinaryModel, dependencies=[Depends(access_all)])
 async def cloudinary_scaled(image_id: int = Path(description="The ID of the image", ge=1), crop: str = "fill",
                             blur: int = 100, current_user: User = Depends(auth_service.get_current_user),
                             db: Session = Depends(get_db)):
@@ -81,8 +77,7 @@ async def cloudinary_scaled(image_id: int = Path(description="The ID of the imag
     return new_image
 
 
-@router.patch("/{image_id}/zoom", response_model=ImageResponseCloudinaryModel)
-# @has_role(allowed_get_comments)
+@router.patch("/{image_id}/zoom", response_model=ImageResponseCloudinaryModel, dependencies=[Depends(access_all)])
 async def cloudinary_zoom(image_id: int = Path(description="The ID of the image", ge=1), zoom: float = 1.0,
                           current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     config_cloudinary()
@@ -100,8 +95,7 @@ async def cloudinary_zoom(image_id: int = Path(description="The ID of the image"
     return new_image
 
 
-@router.patch("/{image_id}/radius", response_model=ImageResponseCloudinaryModel)
-# @has_role(allowed_get_comments)
+@router.patch("/{image_id}/radius", response_model=ImageResponseCloudinaryModel, dependencies=[Depends(access_all)])
 async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1),
                             current_user: User = Depends(auth_service.get_current_user), db: Session = Depends(get_db)):
     config_cloudinary()
@@ -120,8 +114,7 @@ async def cloudinary_radius(image_id: int = Path(description="The ID of the imag
 
 
 # shadow
-@router.patch("/{image_id}/shadow", response_model=ImageResponseCloudinaryModel)
-# @has_role(allowed_get_comments)
+@router.patch("/{image_id}/shadow", response_model=ImageResponseCloudinaryModel, dependencies=[Depends(access_all)])
 async def cloudinary_radius(image_id: int = Path(description="The ID of the image", ge=1), color: str = "black",
                             x: int = 10, y: int = 10, current_user: User = Depends(auth_service.get_current_user),
                             db: Session = Depends(get_db)):

@@ -1,17 +1,11 @@
-*.env
-
+**/.env
 .idea*
-
 alembic*
-
 *.pyc
-
-__pycache__
-
+*__pycache__*
 .env
-
 *.idea*
-
+fly.toml
 
 
 

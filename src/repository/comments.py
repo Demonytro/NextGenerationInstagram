@@ -6,9 +6,6 @@ from sqlalchemy import and_, func
 from src.database.models import User, Comment, UserRole
 from src.schemas import CommentBase
 
-from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
-    allowed_delete_comments
-
 
 async def create_comment(image_id: int, body: CommentBase, db: Session, user: User) -> Comment:
     """

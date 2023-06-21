@@ -10,10 +10,6 @@ from src.repository import users as repository_users
 from src.services.auth import auth_service
 
 
-from src.services.auth_decorators import has_role
-from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
-    allowed_delete_comments
-
 router = APIRouter(prefix='/auth', tags=["auth"])
 security = HTTPBearer()
 

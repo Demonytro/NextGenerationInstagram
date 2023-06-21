@@ -2,9 +2,6 @@ from fastapi import HTTPException, status
 from functools import wraps
 from src.database.models import Image, Comment, User, UserRole
 
-from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
-    allowed_delete_comments
-
 from src.database.db import get_db
 
 
