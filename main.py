@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from src.database.db import get_db
 
 
-from src.routes import auth, images, comments, rating, cloudinary, qr, search_filtering
+from src.routes import users, auth, images, comments, rating, cloudinary, qr, search_filtering
 
 
 app = FastAPI()
@@ -43,7 +43,7 @@ def healthchecker(db: Session = Depends(get_db)):
 
 app.include_router(images.router, prefix="/api")
 app.include_router(comments.router, prefix='/api')
-
+app.include_router(users.router, prefix="/api")
 #маршрут з автентифікацією
 app.include_router(auth.router, prefix="/api")
 app.include_router(rating.router, prefix="/api")

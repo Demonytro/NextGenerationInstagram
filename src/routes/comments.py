@@ -9,15 +9,17 @@ from src.repository import comments as repository_comments
 from src.services.auth import auth_service
 from src.database.models import User, UserRole
 from src.services.auth_decorators import has_role
+from src.database.models import allowed_get_comments, allowed_post_comments, allowed_put_comments, \
+    allowed_delete_comments
 
 router = APIRouter(prefix='/comments', tags=["comments"])
 
 COMM_NOT_FOUND = "Comment not found or not available."
 
-allowed_get_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
-allowed_post_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
-allowed_put_comments = [UserRole.ADMIN, UserRole.MODERATOR]
-allowed_delete_comments = [UserRole.ADMIN, UserRole.MODERATOR]
+# allowed_get_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
+# allowed_post_comments = [UserRole.ADMIN, UserRole.MODERATOR, UserRole.USER]
+# allowed_put_comments = [UserRole.ADMIN, UserRole.MODERATOR]
+# allowed_delete_comments = [UserRole.ADMIN, UserRole.MODERATOR]
 
 
 @router.post("/new/{post_id}", response_model=CommentModel)

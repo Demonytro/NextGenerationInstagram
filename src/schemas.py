@@ -1,6 +1,6 @@
 from datetime import datetime, date
 from pydantic import BaseModel, Field, constr, EmailStr
-from src.database.models import UserRole
+from src.database.models import UserRole, User
 from typing import List, Optional
 from fastapi import UploadFile
 from pydantic.types import conlist
@@ -80,9 +80,22 @@ class ImageResponseCloudinaryModel(BaseModel):
 
 class UserModel(BaseModel):
     username: str = Field(min_length=5, max_length=16)
-    email: str
+    email: EmailStr
     password: str = Field(min_length=6, max_length=10)
     role: UserRole = UserRole.USER
+
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: EmailStr
+    avatar: str
+    role: UserRole
+    detail: str = "User successfully created"
+
+    class Config:
+        orm_mode = True
+
 
 
 class UserDb(BaseModel):
@@ -92,14 +105,6 @@ class UserDb(BaseModel):
     created_at: datetime
     role: UserRole = UserRole.USER
     avatar: str
-
-    class Config:
-        orm_mode = True
-
-
-class UserResponse(BaseModel):
-    user: UserDb
-    detail: str = "User successfully created"
 
     class Config:
         orm_mode = True

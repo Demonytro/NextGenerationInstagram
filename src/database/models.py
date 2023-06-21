@@ -17,8 +17,8 @@ class Image(Base):
     tags = relationship('Tag', secondary='image_tag')
 
     # нужен ??? - comment_id
-    comment_id = Column('comment_id', ForeignKey('comments.id', ondelete='CASCADE'), default=None)
-    comments = relationship('Comment', backref='images')    # ----------------  images
+    # comment_id = Column('comment_id', ForeignKey('comments.id', ondelete='CASCADE'), default=None)
+    # comments = relationship('Comment', backref='images')    # ----------------  images
 
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
@@ -80,17 +80,17 @@ class UserRole(str, Enum):
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    username = Column(String(50))
     email = Column(String(250), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
     created_at = Column('crated_at', DateTime, default=func.now())
+    username = Column(String(50))
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
 
     # role = Column(String(20), default=UserRole.user)
     role = Column(String(20), default=UserRole.USER)
 
-#     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    # confirmed = Column(Boolean, default=False)
 
 
 class BlacklistToken(Base):
